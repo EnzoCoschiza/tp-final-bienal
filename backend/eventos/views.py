@@ -5,9 +5,10 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from django.contrib.auth import authenticate
 
 from .models import Escultores, Eventos, Obras, Imagenes, Votaciones, User
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, imagenesSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, imagenesSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer
 
 # Create your views here.
 
@@ -189,35 +190,32 @@ def register(request):
 
     if serializer.is_valid():
         try:
-            serializer.save()
+            user= serializer.save()
+            #return Response(status=status.HTTP_201_CREATED)
         except IntegrityError as e:
             return Response({"error": "Ya existe un usuario con ese nombre de usuario o correo electrónico."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-        user= User.objects.get(username= serializer.data['username'])
-        user.set_password(serializer.data['password'])
-        user.save()
-
-
+        
         token= Token.objects.create(user=user)
-        return Response({"token": token.key, "user": serializer.data}, status= status.HTTP_201_CREATED)
-    
+        
+        
+        return Response({"token": token.key }, status= status.HTTP_201_CREATED)
+                                            #"user": serializer.data
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 
 
-'''
-#Login de usuario y token
 @api_view(['POST'])
 def login(request):
-    user= get_object_or_404(Usuarios, username=request.data['username'])
+    serializer = loginSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = serializer.validated_data['user']
 
-    if not user.check_password(request.data['password']):
-        return Response({"error": "invalid password"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    token, created = Token.objects.get_or_create(user=user)
+        # Generate token (optional)
+        token, _ = Token.objects.get_or_create(user=user)  # Create or retrieve token
 
-    serializer= usuariosSerializer(instance=user)
+        return Response({
+            "token": token.key if token else None,  # Handle case where token already exists
+            "user": serializer.data
+        }, status=status.HTTP_200_OK)
 
-    return Response({"token": token.key, "user": serializer.data}, status=status.HTTP_200_OK)
-'''
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

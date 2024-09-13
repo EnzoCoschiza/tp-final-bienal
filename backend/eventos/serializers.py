@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
 from .models import *
 
 class escultoresSerializer(serializers.ModelSerializer):
@@ -29,13 +30,17 @@ class userSerializer(serializers.ModelSerializer):
     class Meta:
         model= User 
         fields= ('id','username','first_name','last_name','email','password')
+        extra_kwargs = {'password': {'write_only': True}}
         read_only_fields=('id',)
+
+
 
 class usuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model= UsuariosExtra
-        fields=('id','username','first_name','last_name','email','password','fecha_nacimiento','pais')
+        fields = ('fecha_nacimiento', 'pais')
         read_only_fields=('id',)
+
 
 class UserRegisterSerializer(serializers.Serializer):
     user = userSerializer()
@@ -48,7 +53,7 @@ class UserRegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(**user_data)
         user_extra = UsuariosExtra.objects.create(user=user, **user_extra_data)
         return user
-    
+
 
 class votacionesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,3 +61,34 @@ class votacionesSerializer(serializers.ModelSerializer):
         fields= ('id','puntuacion','id_usuario','id_obra')
         #read_only_fields=('id','id_usuario','id_obra')
 
+
+class loginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False, allow_blank=True)
+    username = serializers.CharField(required=False, allow_blank=True)
+    password = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
+
+        # Asegúrate de que al menos uno de los dos campos (email o username) sea provisto
+        if not email and not username:
+            raise serializers.ValidationError("Debe proporcionar al menos el correo electrónico o el nombre de usuario.")
+
+        # Utiliza authenticate para verificar las credenciales
+        user = authenticate(
+            request=self.context.get('request'),
+            email=email,
+            username=username,
+            password=password
+        )
+
+        # Si la autenticación falla, levantamos una excepción
+        if not user:
+            raise serializers.ValidationError("Credenciales inválidas.")
+
+        # Si la autenticación es exitosa, retornamos los datos del usuario
+        data['user'] = user
+        return data
+    
