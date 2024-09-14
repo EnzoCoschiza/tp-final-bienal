@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -13,25 +15,28 @@ from .serializers import escultoresSerializer, eventosSerializer, obrasSerialize
 # Create your views here.
 
 @api_view(['GET', 'POST'])
+@authentication_classes([TokenAuthentication])
 def escultores_list(request):
     if request.method == 'GET':
         escultores = Escultores.objects.all()
-        serializer= escultoresSerializer(escultores, many=True)
+        serializer = escultoresSerializer(escultores, many=True)
         return Response(serializer.data)
-    
-    elif request.method== 'POST' and request.user.is_authenticated and request.user.is_staff:
-        serializer= escultoresSerializer(data= request.data)
+
+    elif request.method == 'POST':
+        if not request.user.is_staff:  # Verificar que el usuario es admin para POST
+            return Response({'detail': 'No tienes permiso para realizar esta acción.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = escultoresSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        print('No log...')
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 @api_view(['GET', 'DELETE', 'PUT'])
+@authentication_classes([TokenAuthentication])
 def escultor_info(request,pk):
     try:
         escultor = Escultores.objects.get(pk=pk)      
@@ -58,6 +63,7 @@ def escultor_info(request,pk):
 
 
 @api_view(['GET','POST'])
+@authentication_classes([TokenAuthentication])
 def eventos_list(request):
     if request.method=='GET':
         eventos= Eventos.objects.all()
@@ -75,6 +81,7 @@ def eventos_list(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET', 'DELETE', 'PUT'])
+@authentication_classes([TokenAuthentication])
 def evento_info(request, pk):
     try:
         evento= Eventos.objects.get(pk=pk)
@@ -100,6 +107,7 @@ def evento_info(request, pk):
 
 
 @api_view(['GET','POST'])
+@authentication_classes([TokenAuthentication])
 def obras_list(request):
     if request.method=='GET':
         obras= Obras.objects.all()
@@ -117,6 +125,7 @@ def obras_list(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET', 'DELETE', 'PUT'])
+@authentication_classes([TokenAuthentication])
 def obra_info(request, pk):
     try:
         obra= Obras.objects.get(pk=pk)
@@ -142,6 +151,7 @@ def obra_info(request, pk):
 
 
 @api_view(['GET','POST'])
+@authentication_classes([TokenAuthentication])
 def imagenes_list(request):
     if request.method=='GET':
         imagenes= Imagenes.objects.all()
@@ -159,6 +169,7 @@ def imagenes_list(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET', 'DELETE', 'PUT'])
+@authentication_classes([TokenAuthentication])
 def imagen_info(request, pk):
     try:
         imagen= Imagenes.objects.get(pk=pk)
@@ -219,3 +230,7 @@ def login(request):
         }, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+

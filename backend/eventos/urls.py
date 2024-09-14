@@ -1,7 +1,7 @@
 from rest_framework import routers
 from django.urls import path, re_path
 #from .api import escultoresViewSet, eventosViewSet, obrasViewSet, imagenesViewSet, usuariosViewSet, votacionViewSet
-from .views import escultores_list, escultor_info, eventos_list, evento_info, obras_list,obra_info, imagenes_list,imagen_info, register, login
+from .views import escultores_list, escultor_info, eventos_list, evento_info, obras_list,obra_info, imagenes_list,imagen_info, register, login 
 
 router = routers.DefaultRouter()
 
@@ -17,6 +17,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('api/escultores/', escultores_list, name='escultores'),
+    #path('api/escultoresxd/', escultores_list_post, name='escultores_post'),
     path('api/escultores/<int:pk>/', escultor_info, name='escultor_info'),
     path('api/eventos/', eventos_list, name='eventos'),
     path('api/eventos/<int:pk>', evento_info, name='evento_info'),
