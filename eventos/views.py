@@ -267,3 +267,8 @@ def votar_obra(request, obra_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def main(request):
+    return render(request, 'main.html')
