@@ -8,11 +8,8 @@ pip install -r requirements.txt
 # Convert static asset files
 python manage.py collectstatic --no-input
 
-# Apply any outstanding database migrat
+# Apply any outstanding database migrations
 python manage.py migrate
 
-#superusers
-python manage.py createsuperuser \
-  --username "${SUPERUSER_USERNAME}" \
-  --email "${SUPERUSER_EMAIL}" \
-  --password "${SUPERUSER_PASSWORD}"
+# Create superuser using environment variables
+python manage.py shell < create_superuser.py
