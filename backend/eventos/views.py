@@ -265,4 +265,5 @@ def votar_obra(request, obra_id):
 
         # Si hay errores de validación, devolver el error
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)
