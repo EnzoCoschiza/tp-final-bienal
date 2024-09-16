@@ -234,3 +234,35 @@ def login(request):
 
 
 
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])  # Requiere autenticación
+@permission_classes([IsAuthenticated])  # Solo usuarios autenticados pueden votar
+def votar_obra(request, obra_id):
+    # Obtener la obra
+    try:
+        obra = Obras.objects.get(id=obra_id)
+    except Obras.DoesNotExist:
+        return Response({'detail': 'Obra no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+    #print(obra.id_evento)
+    evento = Eventos.objects.get(nombre= obra.id_evento)
+    if evento.evento_en_transcurso():
+        # Verificar si el usuario ya ha votado en esta obra
+        usuario = request.user
+        if Votaciones.objects.filter(id_usuario=usuario, id_obra=obra).exists():
+            return Response({'detail': 'Ya has votado por esta obra'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Agregar usuario y obra a los datos del request
+        data = request.data.copy()  # Creamos una copia del request.data para modificarla
+        data['id_usuario'] = usuario.id  # Añadir el usuario autenticado
+        data['id_obra'] = obra.id  # Añadir la obra
+
+        # Utilizar el serializador para validar y crear la votación
+        serializer = votacionesSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        # Si hay errores de validación, devolver el error
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)

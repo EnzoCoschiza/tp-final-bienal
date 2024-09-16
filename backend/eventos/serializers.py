@@ -11,7 +11,7 @@ class escultoresSerializer(serializers.ModelSerializer):
 class eventosSerializer(serializers.ModelSerializer):
     class Meta:
         model= Eventos
-        fields= ('id','nombre','fecha','lugar','descripcion')
+        fields= ('id','nombre','fecha_inicio','fecha_final','lugar','descripcion')
         read_only_fields= ('id',)
 
 class obrasSerializer(serializers.ModelSerializer):
