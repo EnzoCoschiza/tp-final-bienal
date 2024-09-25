@@ -52,18 +52,6 @@ class Imagenes(models.Model):
     img2= models.ImageField(null=True)
     img3= models.ImageField(null=True)
 
-'''
-class Usuarios(models.Model):
-    nombre_usuario= models.CharField(max_length=20, null=False)
-    nombre= models.CharField(max_length=50, null=False)
-    apellido= models.CharField(max_length=100, null=False)
-    email= models.EmailField(null=False)
-    nacionalidad= models.CharField(max_length=50)
-    fecha_nacimiento= models.DateField(null=False)
-
-    def __str__(self):
-        return self.nombre_usuario
-'''
 
 class UsuariosExtra(models.Model):
     fecha_nacimiento = models.DateField(null=False)
@@ -87,3 +75,5 @@ class Votaciones(models.Model):
     def __str__(self):
         r= str(self.puntuacion)+'-'+ str(self.id_obra)+'-'+str(self.id_usuario)
         return r
+
+

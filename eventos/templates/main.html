@@ -4,17 +4,36 @@
     <ul>
         <li>'api/escultores/' para ver la lista de Escultores</li>
         <li>'api/eventos/' para ver lista de Eventos</li>
-        <li>'api/eventos/<int:pk>' para ver descripcion de evento</li>
+        <li>'api/eventos/'id'' para ver descripcion de evento</li>
         <li>'api/obras/' para ver la lista de Obras</li>
-        <li>'api/obras/<int:pk>' para ver descripcion de obra</li>
+        <li>'api/obras/'id'' para ver descripcion de obra</li>
         <li>'api/imagenes/'</li>
-        <li>'api/imagenes/<int:pk>'</li>
+        <li>'api/imagenes/'id''</li>
         <li>'login' para loguearse, espera un user y pass en JSON</li>
         <li>'register' para registrarse, el JSON es medio raro</li>
-        <li>'api/votar_obra/<int:obra_id>/' para votar</li>
+        <li>'api/votar_obra/'id'/' para votar</li>
     </ul>
 </div>
 
 <div>
     <p>Cabe aclarar que todas las rutas sirven para cualquiera un GET, pero para POST, PUT, DELETE, tenes que ser super usuario...</p>
+</div>
+
+
+<div>
+    <p>JSON PARA REGISTER:</p>
+    <p>{
+        "user": {
+            "username": "inserteuser",
+            "first_name": "insertenombre",
+            "last_name": "inserteapellido",
+            "email": "example@mail.com",
+            "password": "insertepass"
+        },
+        "user_extra": {
+            "fecha_nacimiento": "1990-01-01",
+            "pais": "Argentina"
+            
+        }
+    }</p>
 </div>

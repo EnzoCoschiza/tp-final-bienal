@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'eventos',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'bienal.urls'
@@ -138,4 +140,7 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
+CORS_ALLOWED_ORIGINS = [
+]
+CORS_ALLOW_ALL_ORIGINS= True
+CORS_ALLOW_CREDENTIALS = True

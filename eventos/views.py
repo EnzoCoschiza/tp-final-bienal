@@ -270,5 +270,10 @@ def votar_obra(request, obra_id):
 
 
 
+
+
+
+
+
 def main(request):
     return render(request, 'main.html')
