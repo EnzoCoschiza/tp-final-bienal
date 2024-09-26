@@ -256,6 +256,8 @@ def votar_obra(request, obra_id):
         data = request.data.copy()  # Creamos una copia del request.data para modificarla
         data['id_usuario'] = usuario.id  # Añadir el usuario autenticado
         data['id_obra'] = obra.id  # Añadir la obra
+        data['id_evento'] = evento.id # Añadir el evento
+        
 
         # Utilizar el serializador para validar y crear la votación
         serializer = votacionesSerializer(data=data)
@@ -267,6 +269,24 @@ def votar_obra(request, obra_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['GET'])
+def ver_resultados(request, evento_id):
+    # Obtener el evento
+    evento = get_object_or_404(Eventos, id=evento_id)
+
+    votaciones= Votaciones()
+    resultados = votaciones.resultados_evento(evento_id)
+
+    if not resultados:
+        return Response({'detail': 'No hay votaciones para este evento'}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response(resultados, status=status.HTTP_200_OK)
+
+
 
 
 

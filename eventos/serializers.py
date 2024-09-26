@@ -58,7 +58,10 @@ class UserRegisterSerializer(serializers.Serializer):
 class votacionesSerializer(serializers.ModelSerializer):
     class Meta:
         model= Votaciones
-        fields= ('id','puntuacion','id_usuario','id_obra')
+        fields= ('id','puntuacion','id_usuario','id_obra', 'id_evento')
+        extra_kwargs = {
+            'id_evento': {'required': False}
+        }
         #read_only_fields=('id','id_usuario','id_obra')
 
 

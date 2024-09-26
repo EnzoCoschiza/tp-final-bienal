@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models import Avg, Count
 # Create your models here.
 
 class Escultores(models.Model):
@@ -9,6 +10,7 @@ class Escultores(models.Model):
     fecha_nacimiento= models.DateField(null=False)
     nacionalidad= models.CharField(max_length=50, null=False)
     eventos_ganados= models.CharField(max_length=200)
+    #foto_perfil= models.ImageField(null=True)
 
     def __str__(self):
         return self.nombre + self.apellido
@@ -68,6 +70,7 @@ class Votaciones(models.Model):
     puntuacion = models.IntegerField(choices=[(1, '1 estrella'), (2, '2 estrellas'), (3, '3 estrellas'), (4, '4 estrellas'), (5, '5 estrellas')], default=1)
     id_usuario= models.ForeignKey(User, on_delete=models.DO_NOTHING)
     id_obra=models.ForeignKey(Obras, on_delete=models.DO_NOTHING)
+    id_evento=models.ForeignKey(Eventos, on_delete=models.DO_NOTHING)
 
     class Meta:
         unique_together = ('id_usuario', 'id_obra')  # Evita que un usuario vote más de una vez por obra
@@ -76,4 +79,19 @@ class Votaciones(models.Model):
         r= str(self.puntuacion)+'-'+ str(self.id_obra)+'-'+str(self.id_usuario)
         return r
 
+    def resultados_evento(self, id_evento): 
+        # Filtramos las votaciones del evento específico y agrupamos por obra
+        resultados = Votaciones.objects.filter(id_evento=id_evento)\
+            .values('id_obra__titulo')\
+            .annotate(promedio_puntuacion=Avg('puntuacion'), total_votos=Count('puntuacion'))
+        # Creamos un diccionario con los resultados
+        resultados_dict = {
+            resultado['id_obra__titulo']: {
+                "promedio_puntuacion": round(resultado['promedio_puntuacion'], 2),  # Redondeamos a 2 decimales
+                "total_votos": resultado['total_votos']
+            }
+            for resultado in resultados
+        }
 
+        return resultados_dict
+    
