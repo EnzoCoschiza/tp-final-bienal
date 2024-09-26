@@ -70,7 +70,7 @@ class Votaciones(models.Model):
     puntuacion = models.IntegerField(choices=[(1, '1 estrella'), (2, '2 estrellas'), (3, '3 estrellas'), (4, '4 estrellas'), (5, '5 estrellas')], default=1)
     id_usuario= models.ForeignKey(User, on_delete=models.DO_NOTHING)
     id_obra=models.ForeignKey(Obras, on_delete=models.DO_NOTHING)
-    id_evento=models.ForeignKey(Eventos, on_delete=models.DO_NOTHING)
+    #id_evento=models.ForeignKey(Eventos, on_delete=models.DO_NOTHING)
 
     class Meta:
         unique_together = ('id_usuario', 'id_obra')  # Evita que un usuario vote más de una vez por obra
@@ -80,10 +80,14 @@ class Votaciones(models.Model):
         return r
 
     def resultados_evento(self, id_evento): 
-        # Filtramos las votaciones del evento específico y agrupamos por obra
-        resultados = Votaciones.objects.filter(id_evento=id_evento)\
-            .values('id_obra__titulo')\
+        # Obtenemos todas las votaciones asociadas a las obras del evento
+        obras_del_evento = Obras.objects.filter(id_evento=id_evento).values_list('id', flat=True)
+        votaciones = Votaciones.objects.filter(id_obra__in=obras_del_evento)
+
+        # Agrupamos las votaciones por obra y calculamos el promedio y el total
+        resultados = votaciones.values('id_obra__titulo')\
             .annotate(promedio_puntuacion=Avg('puntuacion'), total_votos=Count('puntuacion'))
+        
         # Creamos un diccionario con los resultados
         resultados_dict = {
             resultado['id_obra__titulo']: {
