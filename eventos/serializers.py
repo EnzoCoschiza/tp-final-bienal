@@ -20,11 +20,6 @@ class obrasSerializer(serializers.ModelSerializer):
         fields= ('id','titulo','fecha_creacion','descripcion','material','id_escultor','id_evento')
         #read_only_fields= ('id', 'id_escultor', 'id_evento')
 
-class imagenesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model= Imagenes
-        fields= ('id', 'id_obra', 'img1','img2','img3')
-        read_only_fields= ('id','id_obra')
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:

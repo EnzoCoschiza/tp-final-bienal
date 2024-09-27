@@ -41,6 +41,7 @@ class Obras(models.Model):
     material= models.CharField(max_length=200) #materiales usados para su construccion
     id_escultor= models.ForeignKey(Escultores, on_delete=models.CASCADE)
     id_evento= models.ForeignKey(Eventos, on_delete=models.CASCADE)
+    #fotos
 
     def __str__(self):
         return self.titulo +' de: '+ self.id_escultor.nombre + self.id_escultor.apellido
@@ -48,11 +49,7 @@ class Obras(models.Model):
     def es_qr_valido(self):
         return self.qr_expiracion and self.qr_expiracion > timezone.now().date()
 
-class Imagenes(models.Model):
-    id_obra= models.ForeignKey(Obras, on_delete=models.CASCADE)
-    img1= models.ImageField(null=False)
-    img2= models.ImageField(null=True)
-    img3= models.ImageField(null=True)
+
 
 
 class UsuariosExtra(models.Model):

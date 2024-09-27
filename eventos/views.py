@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import status, filters, generics
+from rest_framework import status, filters, generics, viewsets, permissions
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -8,190 +8,71 @@ from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
+from rest_framework.views import APIView 
 
-from .models import Escultores, Eventos, Obras, Imagenes, Votaciones, User
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, imagenesSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer
+from .models import Escultores, Eventos, Obras, Votaciones, User
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer
+from rest_framework.exceptions import PermissionDenied
+
+
 
 # Create your views here.
 
-@api_view(['GET', 'POST'])
-@authentication_classes([TokenAuthentication])
-def escultores_list(request):
-    if request.method == 'GET':
-        escultores = Escultores.objects.all()
-        serializer = escultoresSerializer(escultores, many=True)
-        return Response(serializer.data)
+class EscultoresList(viewsets.ModelViewSet):
+    queryset = Escultores.objects.all()
+    serializer_class = escultoresSerializer
+    authentication_classes = [TokenAuthentication]
+    #permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['nombre', 'apellido', 'nacionalidad']
 
-    elif request.method == 'POST':
-        if not request.user.is_staff:  # Verificar que el usuario es admin para POST
-            return Response({'detail': 'No tienes permiso para realizar esta acción.'}, status=status.HTTP_403_FORBIDDEN)
-        
-        serializer = escultoresSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-@api_view(['GET', 'DELETE', 'PUT'])
-@authentication_classes([TokenAuthentication])
-def escultor_info(request,pk):
-    try:
-        escultor = Escultores.objects.get(pk=pk)      
-    except Escultores.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        if not self.request.user.is_staff:
+            raise PermissionDenied("You do not have permission to perform this action.")
+        serializer.save()
     
-    if request.method == 'GET':
-        serializer= escultoresSerializer(escultor)
-        return Response (serializer.data)
-        
-    elif request.user.is_authenticated and request.user.is_staff:
-        if request.method== 'DELETE':
-            escultor.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        
-        elif request.method == 'PUT':
-            serializer= escultoresSerializer(escultor, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)            
-    else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return []
+        return [permissions.IsAdminUser()]
 
 
-@api_view(['GET','POST'])
-@authentication_classes([TokenAuthentication])
-def eventos_list(request):
-    if request.method=='GET':
-        eventos= Eventos.objects.all()
-        serializer = eventosSerializer(eventos, many=True)
-        return Response(serializer.data)
-    
-    elif request.method=='POST' and request.user.is_authenticated and request.user.is_staff:
-        serializer= eventosSerializer(data= request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status= status.HTTP_201_CREATED)
-        
-        return Response(status= status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+class EventosList(viewsets.ModelViewSet):
+    queryset = Eventos.objects.all()
+    serializer_class = eventosSerializer
+    authentication_classes = [TokenAuthentication]
+    #permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['nombre', 'lugar', 'descripcion']
 
-@api_view(['GET', 'DELETE', 'PUT'])
-@authentication_classes([TokenAuthentication])
-def evento_info(request, pk):
-    try:
-        evento= Eventos.objects.get(pk=pk)
-    except Eventos.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        if not self.request.user.is_staff:
+            raise PermissionDenied("You do not have permission to perform this action.")
+        serializer.save()
     
-    if request.method== 'GET':
-        serializer= eventosSerializer(evento)
-        return Response(serializer.data)
-    
-    elif request.user.is_authenticated and request.user.is_staff:
-        if request.method=='DELETE':
-            evento.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        elif request.method=='PUT':
-            serializer= eventosSerializer(evento,data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return []
+        return [permissions.IsAdminUser()]
 
 
-@api_view(['GET','POST'])
-@authentication_classes([TokenAuthentication])
-def obras_list(request):
-    if request.method=='GET':
-        obras= Obras.objects.all()
-        serializer = obrasSerializer(obras, many=True)
-        return Response(serializer.data)
-    
-    elif request.method=='POST' and request.user.is_authenticated and request.user.is_staff:
-        serializer= obrasSerializer(data= request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status= status.HTTP_201_CREATED)
-        
-        return Response(status= status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+class ObrasList(viewsets.ModelViewSet):
+    queryset = Obras.objects.all()
+    serializer_class = obrasSerializer
+    authentication_classes = [TokenAuthentication]
+    #permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['titulo', 'material', 'descripcion']
 
-@api_view(['GET', 'DELETE', 'PUT'])
-@authentication_classes([TokenAuthentication])
-def obra_info(request, pk):
-    try:
-        obra= Obras.objects.get(pk=pk)
-    except Obras.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        if not self.request.user.is_staff:
+            raise PermissionDenied("You do not have permission to perform this action.")
+        serializer.save()
     
-    if request.method== 'GET':
-        serializer= obrasSerializer(obra)
-        return Response(serializer.data)
-    
-    elif request.user.is_authenticated and request.user.is_staff:
-        if request.method=='DELETE':
-            obra.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        elif request.method=='PUT':
-            serializer= obrasSerializer(obra,data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
-@api_view(['GET','POST'])
-@authentication_classes([TokenAuthentication])
-def imagenes_list(request):
-    if request.method=='GET':
-        imagenes= Imagenes.objects.all()
-        serializer = imagenesSerializer(imagenes, many=True)
-        return Response(serializer.data)
-    
-    elif request.method=='POST' and request.user.is_authenticated and request.user.is_staff:
-        serializer= imagenesSerializer(data= request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status= status.HTTP_201_CREATED)
-        
-        return Response(status= status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-@api_view(['GET', 'DELETE', 'PUT'])
-@authentication_classes([TokenAuthentication])
-def imagen_info(request, pk):
-    try:
-        imagen= Imagenes.objects.get(pk=pk)
-    except Imagenes.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method== 'GET':
-        serializer= imagenesSerializer(imagen)
-        return Response(serializer.data)
-    
-    elif request.user.is_authenticated and request.user.is_staff:
-        if request.method=='DELETE':
-            imagen.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        elif request.method=='PUT':
-            serializer= imagenesSerializer(imagen,data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return []
+        return [permissions.IsAdminUser()]
 
 
 #Registro de usuarios y token
@@ -214,7 +95,6 @@ def register(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 
-
 @api_view(['POST'])
 def login(request):
     serializer = loginSerializer(data=request.data)
@@ -230,7 +110,6 @@ def login(request):
         }, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
@@ -272,7 +151,6 @@ def votar_obra(request, obra_id):
 
 
 
-
 @api_view(['GET'])
 def ver_resultados(request, evento_id):
     # Obtener el evento
@@ -287,29 +165,3 @@ def ver_resultados(request, evento_id):
     return Response(resultados, status=status.HTTP_200_OK)
 
 
-
-
-class EscultorSearch(generics.ListAPIView):
-    queryset = Escultores.objects.all()
-    serializer_class = escultoresSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['nombre', 'apellido', 'nacionalidad']
-
-class ObraSearch(generics.ListAPIView):
-    queryset = Obras.objects.all()
-    serializer_class = obrasSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['titulo', 'material', 'descripcion']
-
-class EventoSearch(generics.ListAPIView):
-    queryset = Eventos.objects.all()
-    serializer_class = eventosSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['nombre', 'lugar', 'descripcion']
-
-
-
-
-
-def main(request):
-    return render(request, 'main.html')
