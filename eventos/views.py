@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, filters, generics
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -289,7 +289,23 @@ def ver_resultados(request, evento_id):
 
 
 
+class EscultorSearch(generics.ListAPIView):
+    queryset = Escultores.objects.all()
+    serializer_class = escultoresSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['nombre', 'apellido', 'nacionalidad']
 
+class ObraSearch(generics.ListAPIView):
+    queryset = Obras.objects.all()
+    serializer_class = obrasSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['titulo', 'material', 'descripcion']
+
+class EventoSearch(generics.ListAPIView):
+    queryset = Eventos.objects.all()
+    serializer_class = eventosSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['nombre', 'lugar', 'descripcion']
 
 
 
