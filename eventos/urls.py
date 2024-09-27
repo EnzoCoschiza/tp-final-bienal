@@ -34,7 +34,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     #DOCUMENTATION
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
 
@@ -50,7 +50,7 @@ urlpatterns = [
     re_path('login', login),
     re_path('register', register),
     path('api/votar_obra/<int:obra_id>/', votar_obra, name='votar_obra'),
-    path('', main, name='main'),
+    #path('', main, name='main'),
     path('api/resultados/<int:evento_id>/', ver_resultados, name='resultados_evento'),
     path('api/escultores/search/', EscultorSearch.as_view(), name='escultor-search'),
     path('api/obras/search/', ObraSearch.as_view(), name='obra-search'),
