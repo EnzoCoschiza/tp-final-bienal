@@ -41,13 +41,17 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'eventos',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'rest_framework_swagger',
     'drf_yasg',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -151,3 +155,40 @@ CORS_ALLOW_CREDENTIALS = True
 from corsheaders.defaults import default_methods, default_headers
 CORS_ALLOW_METHODS = list(default_methods)
 CORS_ALLOW_HEADERS = list(default_headers)"""
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+from decouple import config
+# Configuración de Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': 'dq1vfo4c8',
+#     'API_KEY':'891326237393697' ,
+#     'API_SECRET':'UkMAUFrUOnMGaixZ4UA8EiwmXmM',
+# }
+
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Configuración de URLs y rutas para archivos estáticos y de medios
+#MEDIA_URL = f"https://res.cloudinary.com/{config('CLOUDINARY_CLOUD_NAME')}/image/"
+MEDIA_URL = 'res.cloudinary.com/dq1vfo4c8/image/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

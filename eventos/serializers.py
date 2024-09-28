@@ -5,7 +5,7 @@ from .models import *
 class escultoresSerializer(serializers.ModelSerializer):
     class Meta:
         model= Escultores
-        fields= ('id','nombre','apellido','fecha_nacimiento','nacionalidad','eventos_ganados')
+        fields= ('id','nombre','apellido','fecha_nacimiento','nacionalidad','eventos_ganados', 'foto_perfil')
         read_only_fields= ('id',)
 
 class eventosSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class userSerializer(serializers.ModelSerializer):
 class usuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model= UsuariosExtra
-        fields = ('fecha_nacimiento', 'pais')
+        fields = ('birthdate', 'country')
         read_only_fields=('id',)
 
 
@@ -85,5 +85,6 @@ class loginSerializer(serializers.Serializer):
 
         # Si la autenticación es exitosa, retornamos los datos del usuario
         data['user'] = user
+
         return data
     

@@ -2,6 +2,9 @@ from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
 from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 router = routers.DefaultRouter()
 router.register(r'api/escultores', EscultoresList, basename='escultores')
@@ -48,4 +51,4 @@ urlpatterns = [
     #path('api/escultores/search/', EscultorSearch.as_view(), name='escultor-search'),
     #path('api/obras/search/', ObraSearch.as_view(), name='obra-search'),
     #path('api/eventos/search/', EventoSearch.as_view(), name='evento-search'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

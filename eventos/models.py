@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Avg, Count
+from cloudinary.models import CloudinaryField
+from cloudinary.uploader import destroy
 # Create your models here.
 
 class Escultores(models.Model):
@@ -10,7 +12,19 @@ class Escultores(models.Model):
     fecha_nacimiento= models.DateField(null=False)
     nacionalidad= models.CharField(max_length=50, null=False)
     eventos_ganados= models.CharField(max_length=200)
-    #foto_perfil= models.ImageField(null=True)
+    foto_perfil = CloudinaryField('image', folder='Escultores', null=True, blank=True)
+    
+    # def save(self, *args, **kwargs):
+    #     if self.foto_perfil:
+    #         self.foto_perfil = "https://res.cloudinary.com/dq1vfo4c8/"
+    #         super().save(update_fields=['foto_perfil'])
+
+    def delete(self, *args, **kwargs):
+        # Delete the image from Cloudinary
+        if self.foto_perfil:
+            public_id = self.foto_perfil.public_id
+            destroy(public_id)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.nombre + self.apellido
@@ -53,8 +67,8 @@ class Obras(models.Model):
 
 
 class UsuariosExtra(models.Model):
-    fecha_nacimiento = models.DateField(null=False)
-    pais = models.CharField(max_length=50)
+    birthdate = models.DateField(null=False)
+    country = models.CharField(max_length=50)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):

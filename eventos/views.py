@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status, filters, generics, viewsets, permissions
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView 
+
 
 from .models import Escultores, Eventos, Obras, Votaciones, User
 from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer
@@ -77,6 +78,7 @@ class ObrasList(viewsets.ModelViewSet):
 
 #Registro de usuarios y token
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register(request):
     serializer= UserRegisterSerializer(data= request.data)
 
@@ -96,6 +98,7 @@ def register(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])  # No requiere autenticación
 def login(request):
     serializer = loginSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -104,10 +107,22 @@ def login(request):
         # Generate token (optional)
         token, _ = Token.objects.get_or_create(user=user)  # Create or retrieve token
 
-        return Response({
+
+        response_data = {
             "token": token.key if token else None,  # Handle case where token already exists
-            "user": serializer.data
-        }, status=status.HTTP_200_OK)
+            "user": serializer.data,
+        }
+
+        response_data["userinfo"] = {
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "country": user.usuariosextra.country,
+        }
+        if user.is_staff:
+            response_data["role"] = "STAFF"
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
