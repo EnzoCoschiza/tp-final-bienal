@@ -175,11 +175,7 @@ CLOUDINARY_STORAGE = {
     'API_KEY': config('CLOUDINARY_API_KEY'),
     'API_SECRET': config('CLOUDINARY_API_SECRET'),
 }
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': 'dq1vfo4c8',
-#     'API_KEY':'891326237393697' ,
-#     'API_SECRET':'UkMAUFrUOnMGaixZ4UA8EiwmXmM',
-# }
+
 
 
 
