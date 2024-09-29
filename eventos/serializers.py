@@ -50,6 +50,34 @@ class UserRegisterSerializer(serializers.Serializer):
         return user
 
 
+    
+class UserProfileSerializer(serializers.Serializer):
+    user = userSerializer()
+    user_extra = usuariosSerializer()
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user')
+        user_extra_data = validated_data.pop('user_extra')
+
+        # Actualizar el usuario
+        user = instance['user']
+        update_fields = []
+        for attr, value in user_data.items():
+            if attr != 'username':  # No actualizar el username
+                setattr(user, attr, value)
+                update_fields.append(attr)
+        user.save(update_fields=update_fields)
+
+        # Actualizar la información extra del usuario
+        user_extra = instance['user_extra']
+        for attr, value in user_extra_data.items():
+            setattr(user_extra, attr, value)
+        user_extra.save()
+
+        return instance
+    
+
+
 class votacionesSerializer(serializers.ModelSerializer):
     class Meta:
         model= Votaciones

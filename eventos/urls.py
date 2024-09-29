@@ -1,7 +1,7 @@
 from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
-from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList
+from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -38,6 +38,7 @@ urlpatterns = [
     re_path('login', login),
     re_path('register', register),
     path('api/votar_obra/<int:obra_id>/', votar_obra, name='votar_obra'),
+    path('profile/', UserProfileView.as_view(), name='user-profile'),
 
     #path('api/escultores/', EscultoresList.as_view(), name='escultores'),
     #path('api/escultores/<int:pk>/', escultor_info, name='escultor_info'),

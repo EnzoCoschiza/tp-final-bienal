@@ -159,6 +159,8 @@ CORS_ALLOW_HEADERS = list(default_headers)"""
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -180,9 +182,9 @@ CLOUDINARY_STORAGE = {
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
+MEDIA_URL = 'res.cloudinary.com/dq1vfo4c8/image/'
 # Configuración de URLs y rutas para archivos estáticos y de medios
 #MEDIA_URL = f"https://res.cloudinary.com/{config('CLOUDINARY_CLOUD_NAME')}/image/"
-MEDIA_URL = 'res.cloudinary.com/dq1vfo4c8/image/'
+
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

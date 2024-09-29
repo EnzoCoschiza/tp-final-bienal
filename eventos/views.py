@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 
 
 from .models import Escultores, Eventos, Obras, Votaciones, User
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -126,6 +126,27 @@ def login(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        user_extra = user.usuariosextra  # relación OneToOne entre User y usuarios
+        serializer = UserProfileSerializer({
+            'user': user,
+            'user_extra': user_extra
+        })
+        return Response(serializer.data)
+
+    def put(self, request):
+        user = request.user
+        user_extra = user.usuariosextra  # relación OneToOne entre User y usuarios
+        serializer = UserProfileSerializer(instance={'user': user, 'user_extra': user_extra}, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
