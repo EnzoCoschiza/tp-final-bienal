@@ -12,12 +12,19 @@ class Escultores(models.Model):
     fecha_nacimiento= models.DateField(null=False)
     nacionalidad= models.CharField(max_length=50, null=False)
     eventos_ganados= models.CharField(max_length=200)
-    foto_perfil = CloudinaryField('image', folder='Escultores', null=True, blank=True)
+    foto_perfil = CloudinaryField('res.cloudinary.com/dq1vfo4c8/image', folder='Escultores', null=True, blank=True)
     
-    # def save(self, *args, **kwargs):
-    #     if self.foto_perfil:
-    #         self.foto_perfil = "https://res.cloudinary.com/dq1vfo4c8/"
-    #         super().save(update_fields=['foto_perfil'])
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists in the database
+        if self.pk:
+            old_instance = Escultores.objects.get(pk=self.pk)
+            # If the image has changed, delete the old one from Cloudinary
+            if old_instance.foto_perfil and old_instance.foto_perfil != self.foto_perfil:
+                destroy(old_instance.foto_perfil.public_id)
+        super().save(*args, **kwargs)
+        
+
+
 
     def delete(self, *args, **kwargs):
         # Delete the image from Cloudinary
