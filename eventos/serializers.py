@@ -116,3 +116,14 @@ class loginSerializer(serializers.Serializer):
 
         return data
     
+
+class VotosUserSerializer(serializers.Serializer):
+    id_voto= serializers.IntegerField()
+    id_obra = serializers.IntegerField()
+    titulo_obra = serializers.CharField(max_length=100)
+    puntuacion = serializers.IntegerField()
+    id_evento = serializers.IntegerField()
+    nombre_evento = serializers.CharField(max_length=100)
+    id_usuario = serializers.IntegerField()
+    nombre_escultor = serializers.CharField(max_length=50)
+    apellido_escultor = serializers.CharField(max_length=100)

@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 
 
 from .models import Escultores, Eventos, Obras, Votaciones, User
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -201,3 +201,33 @@ def ver_resultados(request, evento_id):
     return Response(resultados, status=status.HTTP_200_OK)
 
 
+
+class UserVotacionesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        votaciones = Votaciones.objects.filter(id_usuario=user)
+        data = []
+        for votacion in votaciones:
+            obra= Obras.objects.get(id= votacion.id_obra.id)
+            evento= Eventos.objects.get(id= obra.id_evento.id)
+
+            votacion_data = {
+                'id_voto': votacion.id,
+                'id_obra': obra.id,
+                'titulo_obra': obra.titulo,
+                'puntuacion': votacion.puntuacion,
+                'id_evento': evento.id,
+                'nombre_evento': evento.nombre,
+                'id_usuario': votacion.id_usuario.id,
+                'nombre_escultor': obra.id_escultor.nombre,
+                'apellido_escultor': obra.id_escultor.apellido
+            }
+            data.append(votacion_data)
+
+
+        serializer = VotosUserSerializer(data, many=True)
+        return Response(serializer.data)
+
+    
