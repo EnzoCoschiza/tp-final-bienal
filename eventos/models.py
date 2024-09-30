@@ -87,7 +87,7 @@ class UsuariosExtra(models.Model):
 class Votaciones(models.Model):
     puntuacion = models.IntegerField(choices=[(1, '1 estrella'), (2, '2 estrellas'), (3, '3 estrellas'), (4, '4 estrellas'), (5, '5 estrellas')], default=1)
     id_usuario= models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    id_obra=models.ForeignKey(Obras, on_delete=models.DO_NOTHING)
+    id_obra=models.ForeignKey(Obras, on_delete=models.CASCADE)
 
 
     class Meta:
