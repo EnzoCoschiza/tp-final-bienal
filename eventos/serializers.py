@@ -37,7 +37,7 @@ class usuariosSerializer(serializers.ModelSerializer):
         read_only_fields=('id',)
 
 
-class UsuariosExtraSerializer(serializers.ModelSerializer):
+class UsuariosCompleteSerializer(serializers.ModelSerializer):
     user = userSerializer()
     class Meta:
         model = UsuariosExtra
