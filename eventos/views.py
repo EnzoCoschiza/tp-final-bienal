@@ -189,6 +189,7 @@ def votar_obra(request, obra_id):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def ver_resultados(request, evento_id):
     # Obtener el evento
     evento = get_object_or_404(Eventos, id=evento_id)
