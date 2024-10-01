@@ -2,17 +2,18 @@ from django.shortcuts import render
 from rest_framework import status, filters, generics, viewsets, permissions
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView 
+from rest_framework.exceptions import NotFound
 
 
-from .models import Escultores, Eventos, Obras, Votaciones, User
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer
+from .models import Escultores, Eventos, Obras, Votaciones, User, UsuariosExtra
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer, UsuariosCompleteSerializer
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -231,3 +232,27 @@ class UserVotacionesView(APIView):
         return Response(serializer.data)
 
     
+class UsuariosCompleteViewSet(viewsets.ModelViewSet):
+    queryset = UsuariosExtra.objects.all()
+    serializer_class = UsuariosCompleteSerializer
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAdminUser]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username', 'user__email', 'country']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = self.request.query_params.get('user_id', None)
+        if user_id is not None:
+            queryset = queryset.filter(user__id=user_id)
+        return queryset
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        user_id = self.kwargs.get('pk')
+        try:
+            return queryset.get(user__id=user_id)
+        except UsuariosExtra.DoesNotExist:
+            raise NotFound('Usuario no encontrado')
+    
+

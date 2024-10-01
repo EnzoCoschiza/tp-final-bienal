@@ -1,7 +1,7 @@
 from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
-from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView
+from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 router.register(r'api/escultores', EscultoresList, basename='escultores')
 router.register(r'api/eventos', EventosList, basename='eventos')
 router.register(r'api/obras', ObrasList, basename='obras')
+router.register(r'api/usuarios', UsuariosCompleteViewSet, basename='usuarios')
 
 
 from rest_framework_swagger.views import get_swagger_view
@@ -40,7 +41,7 @@ urlpatterns = [
     path('api/votar_obra/<int:obra_id>/', votar_obra, name='votar_obra'),
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('api/votaciones/', UserVotacionesView.as_view(), name='user-votaciones'),
-
+    #path('api/usuarios/', AllUsers.as_view(), name='all-users'),
     #path('api/escultores/', EscultoresList.as_view(), name='escultores'),
     #path('api/escultores/<int:pk>/', escultor_info, name='escultor_info'),
     #path('api/eventos/', eventos_list, name='eventos'),

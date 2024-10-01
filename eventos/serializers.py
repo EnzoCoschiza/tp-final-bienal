@@ -37,6 +37,12 @@ class usuariosSerializer(serializers.ModelSerializer):
         read_only_fields=('id',)
 
 
+class UsuariosExtraSerializer(serializers.ModelSerializer):
+    user = userSerializer()
+    class Meta:
+        model = UsuariosExtra
+        fields = ['user', 'birthdate', 'country']
+
 class UserRegisterSerializer(serializers.Serializer):
     user = userSerializer()
     user_extra = usuariosSerializer()
