@@ -23,9 +23,6 @@ class Escultores(models.Model):
                 destroy(old_instance.foto_perfil.public_id)
         super().save(*args, **kwargs)
         
-
-
-
     def delete(self, *args, **kwargs):
         # Delete the image from Cloudinary
         if self.foto_perfil:
@@ -63,7 +60,30 @@ class Obras(models.Model):
     id_escultor= models.ForeignKey(Escultores, on_delete=models.CASCADE)
     id_evento= models.ForeignKey(Eventos, on_delete=models.CASCADE)
     #fotos
+    foto1 = CloudinaryField('res.cloudinary.com/dq1vfo4c8/image', folder='Obras', null=True, blank=True)
+    foto2= CloudinaryField('res.cloudinary.com/dq1vfo4c8/image', folder='Obras', null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists in the database
+        if self.pk:
+            old_instance = Obras.objects.get(pk=self.pk)
+            # If the image has changed, delete the old one from Cloudinary
+            if old_instance.foto1 and old_instance.foto1 != self.foto1:
+                destroy(old_instance.foto1.public_id)
+            if old_instance.foto2 and old_instance.foto2 != self.foto2:
+                destroy(old_instance.foto2.public_id)
+        super().save(*args, **kwargs)
+        
+    def delete(self, *args, **kwargs):
+        # Delete the image from Cloudinary
+        if self.foto1:
+            public_id = self.foto1.public_id
+            destroy(public_id)
+        if self.foto2:
+            public_id = self.foto2.public_id
+            destroy(public_id)
+        super().delete(*args, **kwargs)
+    
     def __str__(self):
         return self.titulo +' de: '+ self.id_escultor.nombre + self.id_escultor.apellido
     
