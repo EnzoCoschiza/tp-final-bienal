@@ -104,8 +104,10 @@ Esta API es parte del sistema de votaciones de la Bienal de escultores. A contin
     "last_name": "César",
     "email": "julio@example.com"
   },
-  "birthdate": "1990-01-01",
-  "country": "Argentina"
+  "user_extra":{
+    "birthdate": "1990-01-01",
+    "country": "Argentina"
+  }
 }
 ```
 
