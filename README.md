@@ -170,7 +170,25 @@ La respuesta contiene un token que se utilizará en las siguientes peticiones:
 ```
 
 ---
+## Password Reset
+Para el reseteo de password debemos hacer una petición POST a /password-reset/ con los siguientes datos:
+```json
+{
+  "email": "email_usuario_que_desea_cambiar_pass@mail.com"
+}
+```
+Este chequeará que haya un usuario asociado a este email, de ser así, enviará un email con un token de reinicio de password a dicho email.
 
+Luego con dicho token debemos hacer una petición POST a /password-reset-confirm/ con la siguiente estructura: 
+```json
+{
+  "token": "UHCl2k7kW7FLMJuhHGwhLk1iZ4L7oAdm",
+  "new_password" : "tunuevapass"
+}
+```
+En caso del token ser correcto, esto efecturá el cambio de contraseña en dicha cuenta asociada...
+
+---
 ## Contacto
 
 Para más información o consultas, contacta al equipo de desarrollo.
