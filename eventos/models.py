@@ -90,9 +90,6 @@ class Obras(models.Model):
     def es_qr_valido(self):
         return self.qr_expiracion and self.qr_expiracion > timezone.now().date()
 
-
-
-
 class UsuariosExtra(models.Model):
     birthdate = models.DateField(null=False)
     country = models.CharField(max_length=50)
@@ -100,9 +97,6 @@ class UsuariosExtra(models.Model):
 
     def __str__(self):
         return str(self.user)
-
-
-
 
 class Votaciones(models.Model):
     puntuacion = models.IntegerField(choices=[(1, '1 estrella'), (2, '2 estrellas'), (3, '3 estrellas'), (4, '4 estrellas'), (5, '5 estrellas')], default=1)
@@ -137,3 +131,10 @@ class Votaciones(models.Model):
 
         return resultados_dict
     
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    password_reset_token = models.CharField(max_length=32, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username

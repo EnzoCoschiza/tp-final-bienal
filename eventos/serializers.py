@@ -20,7 +20,6 @@ class obrasSerializer(serializers.ModelSerializer):
         fields= ('id','titulo','fecha_creacion','descripcion','material','id_escultor','id_evento', 'foto1', 'foto2')
         #read_only_fields= ('id', 'id_escultor', 'id_evento')
 
-
 class userSerializer(serializers.ModelSerializer):
     class Meta:
         model= User 
@@ -28,14 +27,11 @@ class userSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
         read_only_fields=('id',)
 
-
-
 class usuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model= UsuariosExtra
         fields = ('birthdate', 'country')
         read_only_fields=('id',)
-
 
 class UsuariosCompleteSerializer(serializers.ModelSerializer):
     user = userSerializer()
@@ -55,8 +51,6 @@ class UserRegisterSerializer(serializers.Serializer):
         user_extra = UsuariosExtra.objects.create(user=user, **user_extra_data)
         return user
 
-
-    
 class UserProfileSerializer(serializers.Serializer):
     user = userSerializer()
     user_extra = usuariosSerializer()
@@ -82,14 +76,11 @@ class UserProfileSerializer(serializers.Serializer):
 
         return instance
     
-
-
 class votacionesSerializer(serializers.ModelSerializer):
     class Meta:
         model= Votaciones
         fields= ('id','puntuacion','id_usuario','id_obra')
         #read_only_fields=('id','id_usuario','id_obra')
-
 
 class loginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
@@ -122,7 +113,6 @@ class loginSerializer(serializers.Serializer):
 
         return data
     
-
 class VotosUserSerializer(serializers.Serializer):
     id_voto= serializers.IntegerField()
     id_obra = serializers.IntegerField()
@@ -133,3 +123,26 @@ class VotosUserSerializer(serializers.Serializer):
     id_usuario = serializers.IntegerField()
     nombre_escultor = serializers.CharField(max_length=50)
     apellido_escultor = serializers.CharField(max_length=100)
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No user is associated with this email address.")
+        return value
+    
+
+class PasswordResetSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    new_password = serializers.CharField()
+
+    def validate_token(self, value):
+        if not User.objects.filter(profile__password_reset_token=value).exists():
+            raise serializers.ValidationError("Invalid or expired token.")
+        return value
+
+    def validate_new_password(self, value):
+        # agregar validaciones adicionales para la nueva contraseña aquí
+        return value

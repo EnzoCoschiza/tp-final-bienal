@@ -10,10 +10,13 @@ from django.db import IntegrityError
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView 
 from rest_framework.exceptions import NotFound
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.crypto import get_random_string
 
 
-from .models import Escultores, Eventos, Obras, Votaciones, User, UsuariosExtra
-from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer, UsuariosCompleteSerializer
+from .models import Escultores, Eventos, Obras, Votaciones, User, UsuariosExtra, Profile
+from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer, UsuariosCompleteSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -256,5 +259,40 @@ class UsuariosCompleteViewSet(viewsets.ModelViewSet):
             return queryset.get(user__id=user_id)
         except UsuariosExtra.DoesNotExist:
             raise NotFound('Usuario no encontrado')
-    
 
+
+from telnet import send_email
+@permission_classes([AllowAny])
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            user = User.objects.get(email=email)
+            token = get_random_string(length=32)
+            user.profile.password_reset_token = token
+            user.profile.save()
+
+            reset_url = f"http://your-frontend-url.com/reset-password/{token}"
+            subject = "Password Reset Request"
+            body = f"Click the link to reset your password: {reset_url}"
+            send_email(subject, body, email)
+
+            return Response({"detail": "Password reset link has been sent to your email."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([AllowAny])
+class PasswordResetView(APIView):
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            token = serializer.validated_data['token']
+            new_password = serializer.validated_data['new_password']
+            user = User.objects.get(profile__password_reset_token=token)
+            user.set_password(new_password)
+            user.profile.password_reset_token = None
+            user.profile.save()
+            user.save()
+            return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
