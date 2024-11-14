@@ -19,7 +19,7 @@ from .models import Escultores, Eventos, Obras, Votaciones, User, UsuariosExtra,
 from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer, UsuariosCompleteSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
 from rest_framework.exceptions import PermissionDenied
 
-
+from telnet import send_email
 
 # Create your views here.
 
@@ -89,20 +89,43 @@ def register(request):
     if serializer.is_valid():
         try:
             user= serializer.save()
-            #return Response(status=status.HTTP_201_CREATED)
+            user.is_active= False
+            user.save()
         except IntegrityError as e:
             return Response({"error": "Ya existe un usuario con ese nombre de usuario o correo electrónico."}, status=status.HTTP_400_BAD_REQUEST)
         
         token= Token.objects.create(user=user)
+
+        token_email_verif = get_random_string(length=32)
+        user.profile.activation_token = token_email_verif
+        user.profile.save()
+
+        activation_url = f"{settings.FRONTEND_URL}/activate/{token_email_verif}"
+        subject = "Activa tu cuenta de Bienal"
+        body = f"Click en el link para comenzar a usar Bienal App: {activation_url}"
+        send_email(subject, body, user.email)
         
+
         
         return Response({"token": token.key }, status= status.HTTP_201_CREATED)
                                             #"user": serializer.data
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def activate_account(request, token):
+    try:
+        user = User.objects.get(profile__activation_token=token)
+        user.is_active = True
+        user.profile.activation_token = None
+        user.save()
+        return Response({"detail": "Account activated successfully."}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
-@permission_classes([AllowAny])  # No requiere autenticación
+@permission_classes([AllowAny]) 
 def login(request):
     serializer = loginSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -261,7 +284,7 @@ class UsuariosCompleteViewSet(viewsets.ModelViewSet):
             raise NotFound('Usuario no encontrado')
 
 
-from telnet import send_email
+
 @permission_classes([AllowAny])
 class PasswordResetRequestView(APIView):
     def post(self, request):
@@ -275,7 +298,7 @@ class PasswordResetRequestView(APIView):
 
             reset_url = f"http://your-frontend-url.com/reset-password/{token}"
             subject = "Password Reset Request"
-            body = f"Click the link to reset your password: {reset_url}"
+            body = f"Click en el link para cambiar su password: {reset_url}"
             send_email(subject, body, email)
 
             return Response({"detail": "Password reset link has been sent to your email."}, status=status.HTTP_200_OK)

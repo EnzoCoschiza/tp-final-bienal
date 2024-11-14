@@ -1,7 +1,7 @@
 from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
-from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView
+from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView, activate_account
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -43,8 +43,11 @@ urlpatterns = [
     path('', include(router.urls)),
 
     path('api/resultados/<int:evento_id>/', ver_resultados, name='resultados_evento'),
+    #Login, register, verificación de email
     re_path('login', login),
     re_path('register', register),
+    path('verify-email/<str:token>/', activate_account, name='activate_account'),
+
     path('api/votar_obra/<int:obra_id>/', votar_obra, name='votar_obra'),
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('api/votaciones/', UserVotacionesView.as_view(), name='user-votaciones'),

@@ -28,3 +28,4 @@ def send_email(subject, body, to_email):
         print("Correo enviado exitosamente")
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
+

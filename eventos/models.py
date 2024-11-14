@@ -135,6 +135,7 @@ class Votaciones(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     password_reset_token = models.CharField(max_length=32, blank=True, null=True)
+    activation_token = models.CharField(max_length=32, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
