@@ -111,6 +111,8 @@ def register(request):
                                             #"user": serializer.data
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def activate_account(request, token):
@@ -206,6 +208,12 @@ def votar_obra(request, obra_id):
         serializer = votacionesSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+
+            # Enviar email con votacion realizada
+            subject = "Votación realizada"
+            body = f"Has votado por la obra {obra.titulo} en el evento {evento.nombre}"
+            send_email(subject, body, usuario.email)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # Si hay errores de validación, devolver el error
