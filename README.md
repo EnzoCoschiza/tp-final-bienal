@@ -102,7 +102,8 @@ Esta API es parte del sistema de votaciones de la Bienal de escultores. A contin
     "username": "julito",
     "first_name": "Julio",
     "last_name": "César",
-    "email": "julio@example.com"
+    "email": "julio@example.com",
+    "password": "pass123"
   },
   "user_extra":{
     "birthdate": "1990-01-01",
