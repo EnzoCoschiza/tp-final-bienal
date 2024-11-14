@@ -13,3 +13,4 @@ python manage.py migrate
 
 # Create superuser using environment variables
 python manage.py shell < create_superuser.py
+python manage.py create_profiles
