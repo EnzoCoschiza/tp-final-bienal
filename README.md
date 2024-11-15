@@ -194,8 +194,13 @@ En caso del token ser correcto, esto efecturá el cambio de contraseña en dicha
 Cuando utilizamos el POST en el endpoint "Register", nos enviarán un correo de confirmación al email que especificamos en el register. 
 La cuenta se creará, pero se pondrá en inactiva hasta que completemos la confirmación. 
 
+- **Método**: `POST`
+- **Ruta**: `/verify-email/{TOKEN}`
+
 Para activar la cuenta, debemos copiar el token que nos viene al correo. 
+
 Ejemplo : "http://your-frontend-url.com/activate/vjuFuO6yPyzxBqByMJNvACN0xBr1lUSl"
+
 TOKEN: vjuFuO6yPyzxBqByMJNvACN0xBr1lUSl
 
 Con este token, realizamos un POST a "/verify-email/{TOKEN}"
