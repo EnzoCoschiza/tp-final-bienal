@@ -327,3 +327,56 @@ class PasswordResetView(APIView):
             user.save()
             return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from .utils import generate_token
+class GenerateTokenView(APIView):
+    def get(self, request):
+        token = generate_token()
+        return Response({"token": token}, status=status.HTTP_200_OK)
+    
+    
+class VoteView(APIView):
+    def post(self, request, obra_id, token):
+        # Validar el token
+        expected_token = generate_token()
+        if token != expected_token:
+            return Response({"error": "Token inválido o expirado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Obtener la obra
+        try:
+            obra = Obras.objects.get(id=obra_id)
+        except Obras.DoesNotExist:
+            return Response({"error": "Obra no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
+        evento = Eventos.objects.get(nombre= obra.id_evento)
+        if evento.evento_en_transcurso():
+            # Verificar si el usuario ya ha votado en esta obra
+            usuario = request.user
+            if Votaciones.objects.filter(id_usuario=usuario, id_obra=obra).exists():
+                return Response({'detail': 'Ya has votado por esta obra'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Agregar usuario y obra a los datos del request
+            data = request.data.copy()  # Creamos una copia del request.data para modificarla
+            data['id_usuario'] = usuario.id  # Añadir el usuario autenticado
+            data['id_obra'] = obra.id  # Añadir la obra
+            data['id_evento'] = evento.id # Añadir el evento
+        
+
+            # Utilizar el serializador para validar y crear la votación
+            serializer = votacionesSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+
+                # Enviar email con votacion realizada
+                subject = "Votación realizada"
+                body = f"Has votado por la obra {obra.titulo} en el evento {evento.nombre}"
+                send_email(subject, body, usuario.email)
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            # Si hay errores de validación, devolver el error
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+        return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)
+
+        

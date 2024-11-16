@@ -77,8 +77,6 @@ class Obras(models.Model):
     titulo= models.CharField(max_length=100, null=False) #nombre de la obra
     fecha_creacion= models.DateField(null=False)
     descripcion= models.CharField(max_length=500)
-    codigo_qr= models.CharField(max_length=200, null=True, blank=True)
-    qr_expiracion = models.DateTimeField(null=True, blank=True)
     material= models.CharField(max_length=200) #materiales usados para su construccion
     id_escultor= models.ForeignKey(Escultores, on_delete=models.CASCADE)
     id_evento= models.ForeignKey(Eventos, on_delete=models.CASCADE)

@@ -1,7 +1,7 @@
 from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
-from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView, activate_account
+from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView, activate_account, GenerateTokenView, VoteView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -35,6 +35,10 @@ urlpatterns = [
     
     #GOOGLE AUTHENTICATION
     #path('accounts/', include('allauth.urls')),
+
+    #Votacion dinamica para generar QR
+    path('generate-token/', GenerateTokenView.as_view(), name='generate_token'),
+    path('vote/<int:obra_id>/<str:token>/', VoteView.as_view(), name='vote'),
 
     #Restablecer password
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset_request'),
