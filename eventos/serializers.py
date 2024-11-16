@@ -11,14 +11,20 @@ class escultoresSerializer(serializers.ModelSerializer):
 class eventosSerializer(serializers.ModelSerializer):
     class Meta:
         model= Eventos
-        fields= ('id','nombre','fecha_inicio','fecha_final','lugar','descripcion')
+        fields= ('id','nombre','fecha_inicio','fecha_final','lugar','descripcion','evento_en_transcurso', 'foto1', 'foto2')
         read_only_fields= ('id',)
+
+    def get_evento_en_transcurso(self, obj):
+        return obj.evento_en_transcurso()
 
 class obrasSerializer(serializers.ModelSerializer):
     class Meta:
         model= Obras
-        fields= ('id','titulo','fecha_creacion','descripcion','material','id_escultor','id_evento', 'foto1', 'foto2')
+        fields= ('id','titulo','fecha_creacion','descripcion','material','id_escultor','id_evento', 'foto1', 'foto2','votacion_en_transcurso')
         #read_only_fields= ('id', 'id_escultor', 'id_evento')
+
+    def get_votacion_en_transcurso(self, obj):
+        return obj.votacion_en_transcurso()
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
