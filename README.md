@@ -208,6 +208,27 @@ Con este token, realizamos un POST a "/verify-email/{TOKEN}"
 Una vez realizada la accion previa, esto pondra la cuenta como activa y ya podremos accionar con dicho usuario. 
 
 ---
+## Votacion con endpoint dinamico para la creación de QR
+
+- **Método**: `GET`
+- **Ruta**: `/generate-token/`
+
+Cuando realizamos un GET a este enpoint, recibimos un token-hash, que se regenera cada 1 minuto, este hash, sirve para que cada usuario logueado(con su respectivo Auth Token), pueda realizar un voto en el siguiente enpoint:
+
+- **Método**: `POST`
+- **Ruta**: `/vote/{obra_id}/{hash-token}/`
+
+**Ejemplo de JSON**:
+```json
+{
+  "puntuacion": 5
+}
+```
+En el header debe ir el token auth del usuario.
+
+En caso de que el token haya vencido, no permitirá realizar la accion de voto.
+
+---
 ## Contacto
 
 Para más información o consultas, contacta al equipo de desarrollo.
