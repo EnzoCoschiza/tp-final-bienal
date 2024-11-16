@@ -68,10 +68,12 @@ class Eventos(models.Model):
     
     def evento_en_transcurso(self):
         fecha_actual = timezone.now().date()
-        if self.fecha_final >= fecha_actual:
-            return True
+        if self.fecha_final >= fecha_actual and self.fecha_inicio <= fecha_actual:
+            return 'En curso'
+        elif self.fecha_final < fecha_actual:
+            return 'Finalizado'
         else:
-            return False
+            return 'Por iniciar'
 
 class Obras(models.Model):
     titulo= models.CharField(max_length=100, null=False) #nombre de la obra
