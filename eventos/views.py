@@ -329,12 +329,13 @@ class PasswordResetView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 from .utils import generate_token
+@permission_classes([AllowAny])
 class GenerateTokenView(APIView):
     def get(self, request):
         token = generate_token()
         return Response({"token": token}, status=status.HTTP_200_OK)
     
-    
+@permission_classes([AllowAny])   
 class VoteView(APIView):
     def post(self, request, obra_id, token):
         # Validar el token
