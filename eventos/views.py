@@ -102,7 +102,10 @@ def register(request):
 
         activation_url = f"{settings.FRONTEND_URL}/activate/{token_email_verif}"
         subject = "Activa tu cuenta de Bienal"
-        body = f"Click en el link para comenzar a usar Bienal App: {activation_url}"
+        #body = f"Click en el link para comenzar a usar Bienal App: {activation_url}"
+        body=  f"""<h2>Activa tu cuenta desde el siguiente enlace.</h2>
+                <a href="{activation_url}" class="button">Ir al Sitio</a>
+                <p>Gracias por unirte a nosotros. Esperamos que disfrutes de tu experiencia.</p>"""           
         send_email(subject, body, user.email)
         
 
@@ -123,7 +126,11 @@ def activate_account(request, token):
         user.save()
         email= user.email
         subject = "Cuenta activada"
-        body = "Tu cuenta ha sido activada exitosamente."
+        body = f"""<h2>Cuenta activada de forma exitosa!</h2>
+                <a href="{settings.FRONTEND_URL}" class="button">Ir al Sitio</a>
+                <p>Ya podes empezar a participar en nuestras votaciones...</p>
+                <p>Gracias por unirte a nosotros. Esperamos que disfrutes de tu experiencia.</p>"""
+        
         send_email(subject, body, email)
         return Response({"detail": "Account activated successfully."}, status=status.HTTP_200_OK)
 
@@ -216,7 +223,10 @@ def votar_obra(request, obra_id):
 
             # Enviar email con votacion realizada
             subject = "Votación realizada"
-            body = f"Has votado por la obra {obra.titulo} en el evento {evento.nombre}"
+            body = f"""<h2>Realizaste una votación de forma exitosa.</h2>
+                <p>Has votado por la obra {obra.titulo} en el evento {evento.nombre}</p>
+                <a href="{settings.FRONTEND_URL}" class="button">Ir al Sitio</a>
+                <p>Gracias por participar.</p>"""
             send_email(subject, body, usuario.email)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -310,8 +320,10 @@ class PasswordResetRequestView(APIView):
             user.profile.save()
 
             reset_url = f"http://your-frontend-url.com/reset-password/{token}"
-            subject = "Password Reset Request"
-            body = f"Click en el link para cambiar su password: {reset_url}"
+            subject = "Solicitud de restablecimiento de contraseña"
+            body = f"""<h2>Realiza el cambio de contraseña desde el siguiente enlace.</h2>
+                <a href="{reset_url}" class="button">Ir al Sitio</a>
+                <p>En caso de no poder acceder mediante el botón, link: {reset_url}.</p>"""
             send_email(subject, body, email)
 
             return Response({"detail": "Password reset link has been sent to your email."}, status=status.HTTP_200_OK)
@@ -330,6 +342,9 @@ class PasswordResetView(APIView):
             user.profile.password_reset_token = None
             user.profile.save()
             user.save()
+            body= f"""<h2>Contraseña restablecida de forma exitosa.</h2>
+            <a href="{settings.FRONTEND_URL}" class="button">Ir al Sitio</a>"""
+            send_email("Contraseña restablecida", body, user.email)
             return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -375,7 +390,10 @@ class VoteView(APIView):
 
                 # Enviar email con votacion realizada
                 subject = "Votación realizada"
-                body = f"Has votado por la obra {obra.titulo} en el evento {evento.nombre}"
+                body = f"""<h2>Hola, {usuario.first_name}! <br> Realizaste una votación de forma exitosa.</h2>
+                <p>Has votado por la obra {obra.titulo} en el evento {evento.nombre}</p>
+                <a href="{settings.FRONTEND_URL}" class="button">Ir al Sitio</a>
+                <p>Gracias por participar.</p>"""
                 send_email(subject, body, usuario.email)
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
