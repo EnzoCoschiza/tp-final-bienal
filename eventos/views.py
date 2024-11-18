@@ -361,13 +361,13 @@ class VoteView(APIView):
         # Validar el token
         expected_token = generate_token()
         if token != expected_token:
-            return Response({"error": "Token inválido o expirado."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Token inválido o expirado."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Obtener la obra
         try:
             obra = Obras.objects.get(id=obra_id)
         except Obras.DoesNotExist:
-            return Response({"error": "Obra no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Obra no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         evento = Eventos.objects.get(nombre= obra.id_evento)
         if evento.evento_en_transcurso():
