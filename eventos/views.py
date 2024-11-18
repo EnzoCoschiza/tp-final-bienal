@@ -121,7 +121,12 @@ def activate_account(request, token):
         user.is_active = True
         user.profile.activation_token = None
         user.save()
+        email= user.email
+        subject = "Cuenta activada"
+        body = "Tu cuenta ha sido activada exitosamente."
+        send_email(subject, body, email)
         return Response({"detail": "Account activated successfully."}, status=status.HTTP_200_OK)
+
     except User.DoesNotExist:
         return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
