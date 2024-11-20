@@ -416,9 +416,9 @@ class EscultoresConSusObras(APIView):
         id_escultor = request.query_params.get('id_escultor', None)
         
         if id_escultor:
-            escultores = Escultores.objects.filter(id=id_escultor)
+            escultores = Escultores.objects.filter(id=id_escultor).order_by('id')
         else:
-            escultores = Escultores.objects.all()
+            escultores = Escultores.objects.all().order_by('id')
 
         data = []
         for escultor in escultores:
