@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import status, filters, generics, viewsets, permissions
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -15,6 +16,7 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 
 
+
 from .models import Escultores, Eventos, Obras, Votaciones, User, UsuariosExtra, Profile
 from .serializers import escultoresSerializer, eventosSerializer, obrasSerializer, usuariosSerializer, votacionesSerializer, UserRegisterSerializer, userSerializer, loginSerializer, UserProfileSerializer, VotosUserSerializer, UsuariosCompleteSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
 from rest_framework.exceptions import PermissionDenied
@@ -28,8 +30,9 @@ class EscultoresList(viewsets.ModelViewSet):
     serializer_class = escultoresSerializer
     authentication_classes = [TokenAuthentication]
     #permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['nombre', 'apellido', 'nacionalidad']
+    filterset_fields = ['id', 'eventos_ganados', 'nacionalidad', 'nombre','apellido']
 
     def perform_create(self, serializer):
         if not self.request.user.is_staff:
@@ -47,8 +50,9 @@ class EventosList(viewsets.ModelViewSet):
     serializer_class = eventosSerializer
     authentication_classes = [TokenAuthentication]
     #permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['nombre', 'lugar', 'descripcion']
+    filterset_fields = ['id', 'lugar', 'nombre','fecha_inicio', 'fecha_final']
 
     def perform_create(self, serializer):
         if not self.request.user.is_staff:
@@ -66,8 +70,9 @@ class ObrasList(viewsets.ModelViewSet):
     serializer_class = obrasSerializer
     authentication_classes = [TokenAuthentication]
     #permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['titulo', 'material', 'descripcion']
+    filterset_fields = ['id', 'titulo', 'id_escultor', 'id_evento']
 
     def perform_create(self, serializer):
         if not self.request.user.is_staff:
