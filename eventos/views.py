@@ -403,4 +403,38 @@ class VoteView(APIView):
     
         return Response({'detail': 'Votacion finalizada'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+@permission_classes([AllowAny])
+class EscultoresConSusObras(APIView):
+    def get(self, request):
+        id_escultor = request.query_params.get('id_escultor', None)
         
+        if id_escultor:
+            escultores = Escultores.objects.filter(id=id_escultor)
+        else:
+            escultores = Escultores.objects.all()
+
+        data = []
+        for escultor in escultores:
+            obras = Obras.objects.filter(id_escultor=escultor)
+            obras_data = []
+            for obra in obras:
+                obra_data = {
+                    'id': obra.id,
+                    'titulo': obra.titulo,
+                    'material': obra.material,
+                    'descripcion': obra.descripcion
+                }
+                obras_data.append(obra_data)
+
+            escultor_data = {
+                'id': escultor.id,
+                'nombre': escultor.nombre,
+                'apellido': escultor.apellido,
+                'nacionalidad': escultor.nacionalidad,
+                'obras': obras_data
+            }
+            data.append(escultor_data)
+
+        return Response(data, status=status.HTTP_200_OK)

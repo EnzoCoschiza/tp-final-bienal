@@ -1,7 +1,7 @@
 from rest_framework import routers
 from rest_framework.permissions import AllowAny
 from django.urls import path, re_path, include
-from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView, activate_account, GenerateTokenView, VoteView
+from .views import register, login , votar_obra, ver_resultados, EscultoresList, EventosList, ObrasList, UserProfileView, UserVotacionesView, UsuariosCompleteViewSet, PasswordResetRequestView, PasswordResetView, activate_account, GenerateTokenView, VoteView, EscultoresConSusObras
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -55,4 +55,6 @@ urlpatterns = [
     path('api/votar_obra/<int:obra_id>/', votar_obra, name='votar_obra'),
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('api/votaciones/', UserVotacionesView.as_view(), name='user-votaciones'),
+
+    path('api/escultores-obras/', EscultoresConSusObras.as_view(), name='escultores-obras'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
