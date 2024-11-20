@@ -229,6 +229,56 @@ En el header debe ir el token auth del usuario.
 En caso de que el token haya vencido, no permitirá realizar la accion de voto.
 
 ---
+## GET Escultores con sus respectivas obras
+- **Método**: `GET`
+- **Ruta**: `/api/escultores-obras/`
+
+Este endpoint, trae todos los escultores con sus respectivas obras.
+Es decir devuelve un JSON con datos de un escultor y le añade un array con todos los datos de cada una de sus obras.
+
+**Ejemplo de JSON**:
+```json
+[
+    {
+        "id": 2,
+        "nombre": "Leonardo",
+        "apellido": "Da Vinci",
+        "nacionalidad": "Italia",
+        "obras": [
+            {
+                "id": 1,
+                "titulo": "El perro",
+                "material": "Madera",
+                "descripcion": "adasdasd"
+            },
+            {
+                "id": 5,
+                "titulo": "El truco del dedo magico",
+                "material": "Ni idea",
+                "descripcion": "Una locura"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "nombre": "Enzo",
+        "apellido": "Palo",
+        "nacionalidad": "Italia",
+        "obras": [
+            {
+                "id": 6,
+                "titulo": "La Gioconda",
+                "material": "Ni idea",
+                "descripcion": "Lalalala"
+            }
+        ]
+    }]
+```
+
+Ademas, este endpoint, acepta query params para filtrar por algún escultor que deseemos.
+- **Ruta**: `/api/escultores-obras/?id_escultor=idQueDeseemos`
+
+---
 ## Contacto
 
 Para más información o consultas, contacta al equipo de desarrollo.
