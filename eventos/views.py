@@ -422,7 +422,7 @@ class EscultoresConSusObras(APIView):
 
         data = []
         for escultor in escultores:
-            obras = Obras.objects.filter(id_escultor=escultor)
+            obras = Obras.objects.filter(id_escultor=escultor).order_by('id')
             obras_data = []
             for obra in obras:
                 obra_data = {
