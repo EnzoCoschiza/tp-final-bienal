@@ -5,7 +5,7 @@ from .models import *
 class escultoresSerializer(serializers.ModelSerializer):
     class Meta:
         model= Escultores
-        fields= ('id','nombre','apellido','fecha_nacimiento','nacionalidad','eventos_ganados', 'foto_perfil')
+        fields= ('id','nombre','apellido','fecha_nacimiento','nacionalidad','eventos_ganados', 'foto_perfil', 'instagram', 'facebook', 'twitter')
         read_only_fields= ('id',)
 
 class eventosSerializer(serializers.ModelSerializer):
