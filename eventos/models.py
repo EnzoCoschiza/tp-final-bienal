@@ -13,6 +13,10 @@ class Escultores(models.Model):
     nacionalidad= models.CharField(max_length=50, null=False)
     eventos_ganados= models.CharField(max_length=200)
     foto_perfil = CloudinaryField('res.cloudinary.com/dq1vfo4c8/image', folder='Escultores', null=True, blank=True)
+    instagram= models.CharField(max_length=200, null=True)
+    facebook= models.CharField(max_length=200, null=True)
+    twitter= models.CharField(max_length=200, null=True)
+
     
     def save(self, *args, **kwargs):
         # Check if the instance already exists in the database
