@@ -376,7 +376,7 @@ class VoteView(APIView):
             return Response({"detail": "Obra no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         evento = Eventos.objects.get(nombre= obra.id_evento)
-        if evento.evento_en_transcurso():
+        if evento.evento_en_transcurso() == 'En curso':
             # Verificar si el usuario ya ha votado en esta obra
             usuario = request.user
             if Votaciones.objects.filter(id_usuario=usuario, id_obra=obra).exists():
