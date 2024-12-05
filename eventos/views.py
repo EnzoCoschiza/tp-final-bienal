@@ -105,7 +105,7 @@ def register(request):
         user.profile.activation_token = token_email_verif
         user.profile.save()
 
-        activation_url = f"{settings.FRONTEND_URL}/activate/{token_email_verif}"
+        activation_url = f"http://localhost:3000/activate/{token_email_verif}"
         subject = "Activa tu cuenta de Bienal"
         #body = f"Click en el link para comenzar a usar Bienal App: {activation_url}"
         body=  f"""<h2>Activa tu cuenta desde el siguiente enlace.</h2>
@@ -316,22 +316,28 @@ class UsuariosCompleteViewSet(viewsets.ModelViewSet):
 
 @permission_classes([AllowAny])
 class PasswordResetRequestView(APIView):
-    permission_classes= [AllowAny]
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            user = User.objects.get(email=email)
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"detail": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
             token = get_random_string(length=32)
             user.profile.password_reset_token = token
             user.profile.save()
 
-            reset_url = f"http://your-frontend-url.com/reset-password/{token}"
+            reset_url = f"http://localhost:3000/reset-password/{token}"
             subject = "Solicitud de restablecimiento de contraseña"
             body = f"""<h2>Realiza el cambio de contraseña desde el siguiente enlace.</h2>
                 <a href="{reset_url}" class="button">Ir al Sitio</a>
                 <p>En caso de no poder acceder mediante el botón, link: {reset_url}.</p>"""
-            send_email(subject, body, email)
+            try:
+                send_email(subject, body, user.email)
+            except Exception as e:
+                return Response({"detail": "Error al enviar el correo electrónico."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({"detail": "Password reset link has been sent to your email."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
