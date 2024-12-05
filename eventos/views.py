@@ -316,6 +316,7 @@ class UsuariosCompleteViewSet(viewsets.ModelViewSet):
 
 @permission_classes([AllowAny])
 class PasswordResetRequestView(APIView):
+    permission_classes= [AllowAny]
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
@@ -338,6 +339,7 @@ class PasswordResetRequestView(APIView):
 
 @permission_classes([AllowAny])
 class PasswordResetView(APIView):
+    permission_classes= [AllowAny]
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
