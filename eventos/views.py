@@ -208,7 +208,8 @@ def votar_obra(request, obra_id):
 
     #print(obra.id_evento)
     evento = Eventos.objects.get(nombre= obra.id_evento)
-    if evento.evento_en_transcurso():
+    estado_evento= evento.evento_en_transcurso()
+    if estado_evento == 'En curso':
         # Verificar si el usuario ya ha votado en esta obra
         usuario = request.user
         if Votaciones.objects.filter(id_usuario=usuario, id_obra=obra).exists():
